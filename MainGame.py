@@ -6,7 +6,7 @@ author:Charles Su
 create on 2021-12-26 23:00:59
 '''
 import pygame
-import tank.MyTank
+from tank.Tank import *
 # 将pygame.display重命名一下，方便使用
 _dispaly = pygame.display
 # 版本号
@@ -34,6 +34,7 @@ class MainGame():
         # 创建窗口，加载窗口
         _dispaly.init()
         MainGame.window = _dispaly.set_mode([MainGame.SCREEN_WIDTH,MainGame.SCREEN_HEIGHT])
+        MainGame.TANK_P1 = MyTank(MainGame.SCREEN_WIDTH/2,MainGame.SCREEN_HEIGHT/2)
         # 设置标题
         _dispaly.set_caption("坦克大战{0}".format(_VERSION))
         # 让窗口持续刷新
@@ -44,6 +45,8 @@ class MainGame():
             self.getEvent()
             # 将绘制的小画布贴到窗口里
             MainGame.window.blit(self.getTextSurface("剩余敌方坦克%d辆"%5),(5,5))
+            # 将我方坦克加入到窗口
+            MainGame.TANK_P1.display(MainGame.window)
             # 刷新
             _dispaly.update()
     
@@ -83,7 +86,7 @@ class MainGame():
         font = pygame.font.SysFont('kaiti',18)
         # 使用对应的字符完成相关内容的绘制
         textSurface = font.render(text,True,MainGame.FONT_COLOR)
-        return textSurface;
+        return textSurface
     
     # 结束游戏
     def endGame(self):

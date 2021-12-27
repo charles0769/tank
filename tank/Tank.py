@@ -5,15 +5,18 @@ author:Charles Su
 create on 2021-12-26 23:03:46
 '''
 import pygame
+import sys
+sys.path.append('../')
+import MainGame
 
 
 class Tank:
     def __init__(self,left,top):
         self.images = {
-            'U': pygame.image.load(''),
-            'D': pygame.image.load(''),
-            'L': pygame.image.load(''),
-            'R': pygame.image.load(''),
+            'U': pygame.image.load('坦克大战\\images\\tankU.gif'),
+            'D': pygame.image.load('坦克大战\\images\\tankD.gif'),
+            'L': pygame.image.load('坦克大战\\images\\tankL.gif'),
+            'R': pygame.image.load('坦克大战\\images\\tankR.gif'),
         }
         self.direction = 'U'
         self.image = self.images[self.direction]
@@ -32,6 +35,17 @@ class Tank:
     def shoot(self):
         pass
     
-    # 坦克展示
-    def display(self):
-        pass
+    # 坦克展示(将坦克这个surface绘制到窗口中)
+    def display(self,window):
+        # 1.重新设置坦克的图片
+        self.image = self.images[self.direction]
+        # 2.将坦克加入到窗口中
+        window.blit(self.image,self.rect)
+        
+class MyTank(Tank):
+    def __init__(self,left,top):
+        super().__init__(left,top)
+        
+class EnemyTank(Tank):
+    def __init__(self,left,top) -> None:
+        super().__init__(left,top)
