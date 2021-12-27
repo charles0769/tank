@@ -75,7 +75,7 @@ class MainGame():
                     # 修改坦克方向
                     MainGame.TANK_P1.direction = 'R'
                     # 根据速度移动坦克
-                    MainGame.TANK_P1.move()
+                    MainGame.TANK_P1.move(MainGame.SCREEN_WIDTH)
                 elif event.key == pygame.K_UP:
                     # 上方向键
                     print("坦克向上调头,移动")
@@ -89,7 +89,7 @@ class MainGame():
                     # 修改坦克方向
                     MainGame.TANK_P1.direction = 'D'
                     # 根据速度移动坦克
-                    MainGame.TANK_P1.move()
+                    MainGame.TANK_P1.move(MainGame.SCREEN_HEIGHT)
                 elif event.key == pygame.K_SPACE:
                     # 空格
                     print("坦克发射子弹")

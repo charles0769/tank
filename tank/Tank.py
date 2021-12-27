@@ -30,20 +30,20 @@ class Tank:
         self.speed = 5
     
     # 坦克的移动方法
-    def move(self):
+    def move(self,distance=0):
         # 判断目前坦克方向
         if self.direction == 'L':
             # 往左的话，rect的left属性要减少
-            self.rect.left -= self.speed
+            self.rect.left -= self.speed if self.rect.left >= self.speed else self.rect.left
         elif self.direction == 'R':
             # 往右的话，rect的left属性要增加
-            self.rect.left += self.speed
+            self.rect.left += self.speed if self.rect.left + self.rect.height + self.speed <= distance else 0
         elif self.direction == 'U':
             # 往上的话，rect的top属性要减少
-            self.rect.top -= self.speed
+            self.rect.top -= self.speed if self.rect.top >= self.speed else self.rect.top
         elif self.direction == 'D':
             # 往下的话，rect的top属性要增加
-            self.rect.top += self.speed
+            self.rect.top += self.speed if self.rect.top + self.rect.height + self.speed <= distance else 0
     
     # 坦克的射击方法
     def shoot(self):
