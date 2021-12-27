@@ -65,15 +65,31 @@ class MainGame():
                 if event.key == pygame.K_LEFT:
                     # 左方向键
                     print("坦克向左调头,移动")
+                    # 修改坦克方向
+                    MainGame.TANK_P1.direction = 'L'
+                    # 根据速度移动坦克
+                    MainGame.TANK_P1.move()
                 elif event.key == pygame.K_RIGHT:
                     # 右方向键
                     print("坦克向右调头,移动")
+                    # 修改坦克方向
+                    MainGame.TANK_P1.direction = 'R'
+                    # 根据速度移动坦克
+                    MainGame.TANK_P1.move()
                 elif event.key == pygame.K_UP:
                     # 上方向键
                     print("坦克向上调头,移动")
+                    # 修改坦克方向
+                    MainGame.TANK_P1.direction = 'U'
+                    # 根据速度移动坦克
+                    MainGame.TANK_P1.move()
                 elif event.key == pygame.K_DOWN:
                     # 下方向键
                     print("坦克向下调头,移动")
+                    # 修改坦克方向
+                    MainGame.TANK_P1.direction = 'D'
+                    # 根据速度移动坦克
+                    MainGame.TANK_P1.move()
                 elif event.key == pygame.K_SPACE:
                     # 空格
                     print("坦克发射子弹")

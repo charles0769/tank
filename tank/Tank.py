@@ -26,10 +26,24 @@ class Tank:
         # 指定坦克初始化位置
         self.rect.left = left
         self.rect.top = top
+        # 新增速度属性
+        self.speed = 5
     
     # 坦克的移动方法
     def move(self):
-        pass
+        # 判断目前坦克方向
+        if self.direction == 'L':
+            # 往左的话，rect的left属性要减少
+            self.rect.left -= self.speed
+        elif self.direction == 'R':
+            # 往右的话，rect的left属性要增加
+            self.rect.left += self.speed
+        elif self.direction == 'U':
+            # 往上的话，rect的top属性要减少
+            self.rect.top -= self.speed
+        elif self.direction == 'D':
+            # 往下的话，rect的top属性要增加
+            self.rect.top += self.speed
     
     # 坦克的射击方法
     def shoot(self):
