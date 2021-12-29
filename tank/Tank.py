@@ -7,7 +7,7 @@ create on 2021-12-26 23:03:46
 import pygame,random
 import sys
 sys.path.append('../')
-import MainGame
+import MainGame,bullet.Bullet
 
 
 class Tank:
@@ -49,7 +49,7 @@ class Tank:
     
     # 坦克的射击方法
     def shoot(self):
-        pass
+        return bullet.Bullet(self)
     
     # 坦克展示(将坦克这个surface绘制到窗口中)
     def display(self,window):
@@ -82,6 +82,8 @@ class EnemyTank(Tank):
         self.speed = speed
         # 新增一个移动开关，初始化时是关的
         self.stop = True
+        # 新增一个步数控制
+        self.step = random.randint(1,20)
         
     def randDirection(self):
         num = random.randint(1,4)
@@ -93,5 +95,15 @@ class EnemyTank(Tank):
             return 'R'
         elif num == 4:
             return 'D'
+    
     def displayEnemtTank(self,window):
         super().display(window)
+    
+    # 敌方坦克随机移动 
+    def randMove(self,width,height):
+        if self.step <= 0:
+            self.direction = self.randDirection()
+            self.step = random.randint(20,50)
+        else:
+            self.move(width,height)
+            self.step -= self.speed
