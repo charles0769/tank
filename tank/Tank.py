@@ -7,10 +7,12 @@ create on 2021-12-26 23:03:46
 import pygame,random
 import sys
 sys.path.append('../')
-import MainGame,bullet.Bullet
+import MainGame
+from bullet.Bullet import *
+from baseitem.BaseItem import *
 
 
-class Tank:
+class Tank(BaseItem):
     def __init__(self,left,top):
         self.images = {
             'U': pygame.image.load('坦克大战\\images\\tankU.gif'),
@@ -30,6 +32,8 @@ class Tank:
         self.speed = 5
         # 新增一个移动开关，初始化时是关的
         self.stop = True
+        # 新增属性 live用来记录坦克是否活着
+        self.live = True
     
     # 坦克的移动方法
     def move(self, width=0, height=0):
@@ -49,7 +53,7 @@ class Tank:
     
     # 坦克的射击方法
     def shoot(self):
-        return bullet.Bullet(self)
+        return Bullet(self)
     
     # 坦克展示(将坦克这个surface绘制到窗口中)
     def display(self,window):
@@ -64,6 +68,7 @@ class MyTank(Tank):
         
 class EnemyTank(Tank):
     def __init__(self,left,top,speed=5) -> None:
+        super(EnemyTank, self).__init__(left,top)
         self.images = {
             'U': pygame.image.load('坦克大战\\images\\InkedtankU.gif'),
             'D': pygame.image.load('坦克大战\\images\\InkedtankD.gif'),
@@ -107,3 +112,10 @@ class EnemyTank(Tank):
         else:
             self.move(width,height)
             self.step -= self.speed
+        
+    # 坦克的射击方法
+    def shoot(self):
+        # 随机生成几个数，只有随机数为1时，生成一个子弹
+        num = random.randint(1,25)
+        if num == 1:
+            return Bullet(self)

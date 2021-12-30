@@ -7,7 +7,7 @@ create on 2021-12-26 23:00:59
 '''
 import pygame,time
 from tank.Tank import *
-from bullet.Bullet import Bullet
+from bullet.Bullet import *
 # 将pygame.display重命名一下，方便使用
 _dispaly = pygame.display
 # 版本号
@@ -32,6 +32,8 @@ class MainGame():
     EnemyTank_count = 5
     # 存储我方坦克子弹的列表
     Bullet_list = []
+    # 存储敌方坦克子弹的列表
+    eBullet_list = []
     
     def __init__(self):
         pass
@@ -62,8 +64,10 @@ class MainGame():
             # 根据坦克的移动开关状态，调用坦克的移动方法
             if MainGame.TANK_P1 and not MainGame.TANK_P1.stop:
                 MainGame.TANK_P1.move(MainGame.SCREEN_WIDTH,MainGame.SCREEN_HEIGHT)
-            # 渲染子弹
+            # 渲染我方子弹
             self.blitBullet()
+            # 渲染敌方子弹
+            self.blitEnemyBullet()
             # 降低画布刷新率
             time.sleep(0.02)
             # 刷新
@@ -72,24 +76,51 @@ class MainGame():
     def creatEnemyTank(self):
         top = 100
         for i in range(MainGame.EnemyTank_count):
+            # 随机生成一个速度
+            speed = random.randint(3,7)
             # 每次都随机生成一个left值
             left = random.randint(1, MainGame.SCREEN_WIDTH/100 - 1) * 100
-            eTank = EnemyTank(left,top)
+            eTank = EnemyTank(left,top,speed)
             MainGame.EnemyTank_list.append(eTank)
         
     # 将敌方坦克加入到窗口中
     def blitEnemyTank(self):
         for eTank in MainGame.EnemyTank_list:
-            eTank.displayEnemtTank(MainGame.window)
-            # 敌方坦克移动
-            eTank.randMove(MainGame.SCREEN_WIDTH,MainGame.SCREEN_HEIGHT)
+            if eTank.live:
+                eTank.displayEnemtTank(MainGame.window)
+                # 敌方坦克移动
+                eTank.randMove(MainGame.SCREEN_WIDTH,MainGame.SCREEN_HEIGHT)
+                # 敌方坦克射击
+                eBullet = eTank.shoot()
+                # 如果子弹为None，不加入列表
+                if eBullet:
+                    MainGame.eBullet_list.append(eBullet)
+            else:
+                MainGame.EnemyTank_list.remove(eTank)
     
     # 将我方子弹加入到窗口中
     def blitBullet(self):
-        for bullet in MainGame.Bullet_list:
-            bullet.display(MainGame.window)
-            # 让子弹移动
-            bullet.move(MainGame.SCREEN_WIDTH,MainGame.SCREEN_HEIGHT)
+        for bullets in MainGame.Bullet_list:
+            # 如果子弹还活着，就渲染，否则从列表中移除
+            if bullets.live:
+                bullets.display(MainGame.window)
+                # 让子弹移动
+                bullets.move(MainGame.SCREEN_WIDTH,MainGame.SCREEN_HEIGHT)
+                # 调用我方子弹碰撞敌方坦克的方法
+                bullets.hitEnemyTank(MainGame.EnemyTank_list)
+            else:
+                MainGame.Bullet_list.remove(bullets)
+    
+    # 将敌方子弹加入到窗口中
+    def blitEnemyBullet(self):
+        for eBullet in MainGame.eBullet_list:
+            # 如果子弹还活着，就渲染，否则从列表中移除
+            if eBullet.live:
+                eBullet.display(MainGame.window)
+                # 让子弹移动
+                eBullet.move(MainGame.SCREEN_WIDTH,MainGame.SCREEN_HEIGHT)
+            else:
+                MainGame.eBullet_list.remove(eBullet)
     
     # 获取程序期间所有的事件(鼠标事件，键盘事件，...)
     def getEvent(self):
@@ -141,11 +172,14 @@ class MainGame():
                     MainGame.TANK_P1.stop = False
                 elif event.key == pygame.K_SPACE:
                     # 空格
-                    print("坦克发射子弹")
-                    # 产生一颗子弹
-                    m = Bullet(MainGame.TANK_P1)
-                    # 将子弹加入到子弹列表
-                    MainGame.Bullet_list.append(m)
+                    if len(MainGame.Bullet_list) < 5:
+                        # 产生一颗子弹
+                        m = Bullet(MainGame.TANK_P1)
+                        # 将子弹加入到子弹列表
+                        MainGame.Bullet_list.append(m)
+                        print("坦克发射子弹,当前子弹数量为:%d"%(len(MainGame.Bullet_list)))
+                    else:
+                        print("子弹数量不足,当前子弹数量为:%d"%(len(MainGame.Bullet_list)))
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT or event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                     # 当方向键按键松开时，将坦克的状态改成停止

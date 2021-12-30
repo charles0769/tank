@@ -4,8 +4,11 @@ author:Charles Su
 create on 2021-12-26 23:12:04
 '''
 import pygame
+import sys
+sys.path.append('../')
+from baseitem.BaseItem import *
 
-class Bullet:
+class Bullet(BaseItem):
     def __init__(self,tank) -> None:
         # 图片
         self.images = {
@@ -33,6 +36,8 @@ class Bullet:
             self.rect.top = tank.rect.top + tank.rect.width/2 - self.rect.width/2
         # 速度
         self.speed = 7
+        # 记录子弹是否活着
+        self.live = True
     
     # 子弹的移动方法
     def move(self,width,height):
@@ -40,23 +45,35 @@ class Bullet:
             if self.rect.top > 0:
                 self.rect.top -= self.speed
             else:
-                pass
+                # 修改状态值
+                self.live = False
         elif self.direction == 'D':
             if self.rect.top < height - self.rect.height:
                 self.rect.top += self.speed
             else:
-                pass
+                # 修改状态值
+                self.live = False
         elif self.direction == 'L':
             if self.rect.left > 0:
                 self.rect.left -= self.speed
             else:
-                pass
+                # 修改状态值
+                self.live = False
         elif self.direction == 'R':
             if self.rect.left < width - self.rect.width:
                 self.rect.left += self.speed
             else:
-                pass
+                # 修改状态值
+                self.live = False
     
     # 展示子弹
     def display(self,window):
         window.blit(self.image, self.rect)
+    
+    # 新增我方子弹碰撞敌方坦克的方法
+    def hitEnemyTank(self,EnemyTank_list):
+        for eTank in EnemyTank_list:
+            if pygame.sprite.collide_rect(eTank,self):
+                self.live = False
+                eTank.live = False
+    
