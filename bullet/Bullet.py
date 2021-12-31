@@ -7,6 +7,7 @@ import pygame
 import sys
 sys.path.append('../')
 from baseitem.BaseItem import *
+from explode.Explode import *
 
 class Bullet(BaseItem):
     def __init__(self,tank) -> None:
@@ -71,9 +72,26 @@ class Bullet(BaseItem):
         window.blit(self.image, self.rect)
     
     # 新增我方子弹碰撞敌方坦克的方法
-    def hitEnemyTank(self,EnemyTank_list):
+    def hitEnemyTank(self,EnemyTank_list,Explode_list):
         for eTank in EnemyTank_list:
             if pygame.sprite.collide_rect(eTank,self):
+                # 产生一个爆炸效果
+                explode = Explode(eTank)
+                # 将爆炸效果加入到爆炸效果列表
+                Explode_list.append(explode)
+                # 改变子弹状态
                 self.live = False
+                # 改变坦克状态
                 eTank.live = False
     
+    # 新增敌方子弹碰撞我方坦克的方法
+    def hitMyTank(self,tank,Explode_list):
+        if pygame.sprite.collide_rect(self,tank):
+            # 产生爆炸效果，并加入到爆炸效果列表里
+            explode = Explode(tank)
+            Explode_list.append(explode)
+            # 修改子弹状态
+            self.live = False
+            # 修改坦克状态
+            tank.live = False
+            
