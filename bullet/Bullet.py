@@ -94,4 +94,14 @@ class Bullet(BaseItem):
             self.live = False
             # 修改坦克状态
             tank.live = False
+    
+    # 新增子弹与墙壁的碰撞方法
+    def hitWalls(self,Wall_list):
+        for wall in Wall_list:
+            if pygame.sprite.collide_rect(wall,self):
+                # 修改子弹的live属性
+                self.live = False
+                wall.hp -= 1
+                if wall.hp <= 0:
+                    wall.live = False
             

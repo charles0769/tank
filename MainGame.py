@@ -8,6 +8,8 @@ create on 2021-12-26 23:00:59
 import pygame,time
 from tank.Tank import *
 from bullet.Bullet import *
+from wall.Wall import *
+from music.Music import *
 # 将pygame.display重命名一下，方便使用
 _dispaly = pygame.display
 # 版本号
@@ -36,6 +38,8 @@ class MainGame():
     eBullet_list = []
     # 存储爆炸效果列表
     Explode_list = []
+    # 存储墙壁的列表
+    Wall_list = []
     
     def __init__(self):
         pass
@@ -49,12 +53,16 @@ class MainGame():
         self.createMyTank()
         # 创建敌方坦克
         self.createEnemyTank()
+        # 创建墙壁
+        self.createWalls()
         # 设置标题
         _dispaly.set_caption("坦克大战{0}".format(_VERSION))
         # 让窗口持续刷新
         while True:
             # 给窗口填充一个颜色
             MainGame.window.fill(MainGame.SCREEN_COLOR)
+            # 调用展示墙壁的效果
+            self.blitWalls()
             # 获取事件
             self.getEvent()
             # 将绘制的小画布贴到窗口里
@@ -70,6 +78,10 @@ class MainGame():
             # 根据坦克的移动开关状态，调用坦克的移动方法
             if MainGame.TANK_P1 and not MainGame.TANK_P1.stop:
                 MainGame.TANK_P1.move(MainGame.SCREEN_WIDTH,MainGame.SCREEN_HEIGHT)
+                # 移动后，调用判断是否碰撞墙壁的方法
+                MainGame.TANK_P1.hitWalls(MainGame.Wall_list)
+                # 移动后，调用判断是否碰撞敌方坦克的方法
+                MainGame.TANK_P1.hitEnemyTank(MainGame.EnemyTank_list)
             # 渲染我方子弹
             self.blitBullet()
             # 渲染敌方子弹
@@ -95,7 +107,22 @@ class MainGame():
             left = random.randint(1, MainGame.SCREEN_WIDTH/100 - 1) * 100
             eTank = EnemyTank(left,top,speed)
             MainGame.EnemyTank_list.append(eTank)
-        
+    
+    # 创建墙壁
+    def createWalls(self):
+        # 随机生成5块qiangbi 
+        for i in range(6):
+            wall = Wall(110*i,MainGame.SCREEN_HEIGHT/3)
+            MainGame.Wall_list.append(wall)
+    
+    # 将墙壁加入到窗口
+    def blitWalls(self):
+        for  wall in MainGame.Wall_list:
+            if wall.live:
+                wall.display(MainGame.window)
+            else:
+                MainGame.Wall_list.remove(wall)
+    
     # 将敌方坦克加入到窗口中
     def blitEnemyTank(self):
         for eTank in MainGame.EnemyTank_list:
@@ -103,11 +130,18 @@ class MainGame():
                 eTank.displayEnemtTank(MainGame.window)
                 # 敌方坦克移动
                 eTank.randMove(MainGame.SCREEN_WIDTH,MainGame.SCREEN_HEIGHT)
+                # 移动后，调用判断是否碰撞墙壁的方法
+                eTank.hitWalls(MainGame.Wall_list)
+                # 移动后，调用判断是否碰撞我方坦克的方法
+                if MainGame.TANK_P1:
+                    eTank.hitMyTank(MainGame.TANK_P1)
+                if len(MainGame.EnemyTank_list) > 0:
+                    eTank.hitEnemyTank(MainGame.EnemyTank_list)
                 # 敌方坦克射击
                 eBullet = eTank.shoot()
                 # 如果子弹为None，不加入列表
                 if eBullet:
-                    MainGame.eBullet_list.append(eBullet)
+                      MainGame.eBullet_list.append(eBullet)
             else:
                 MainGame.EnemyTank_list.remove(eTank)
     
@@ -121,6 +155,8 @@ class MainGame():
                 bullets.move(MainGame.SCREEN_WIDTH,MainGame.SCREEN_HEIGHT)
                 # 调用我方子弹碰撞敌方坦克的方法
                 bullets.hitEnemyTank(MainGame.EnemyTank_list,MainGame.Explode_list)
+                # 调用子弹撞击墙壁的方法
+                bullets.hitWalls(MainGame.Wall_list)
             else:
                 MainGame.Bullet_list.remove(bullets)
     
@@ -135,6 +171,8 @@ class MainGame():
                 # 调用敌方子弹碰撞我方坦克的方法
                 if MainGame.TANK_P1 and MainGame.TANK_P1.live:
                     eBullet.hitMyTank(MainGame.TANK_P1,MainGame.Explode_list)
+                # 调用子弹撞击墙壁的方法
+                eBullet.hitWalls(MainGame.Wall_list)
             else:
                 MainGame.eBullet_list.remove(eBullet)
     
@@ -208,6 +246,9 @@ class MainGame():
                             # 将子弹加入到子弹列表
                             MainGame.Bullet_list.append(m)
                             print("坦克发射子弹,当前子弹数量为:%d"%(len(MainGame.Bullet_list)))
+                            # 初始化音效
+                            music = Music('坦克大战\\music\\music\\fire.wav')
+                            music.play()
                         else:
                             print("子弹数量不足,当前子弹数量为:%d"%(len(MainGame.Bullet_list)))
             if event.type == pygame.KEYUP:

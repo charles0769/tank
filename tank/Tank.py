@@ -34,9 +34,16 @@ class Tank(BaseItem):
         self.stop = True
         # 新增属性 live用来记录坦克是否活着
         self.live = True
+        # 新增属性 用来记录坦克移动之前的坐标
+        self.oldLeft = self.rect.left
+        self.oldTop = self.rect.top
     
     # 坦克的移动方法
     def move(self, width=0, height=0):
+        # 先记录移动前的坐标
+        self.oldLeft = self.rect.left
+        self.oldTop = self.rect.top
+        
         # 判断目前坦克方向
         if self.direction == 'L':
             # 往左的话，rect的left属性要减少
@@ -51,6 +58,24 @@ class Tank(BaseItem):
             # 往下的话，rect的top属性要增加
             self.rect.top += self.speed if self.rect.top + self.rect.height + self.speed <= height else 0
     
+    # 新增主动碰撞敌方坦克的方法
+    def hitEnemyTank(self,EnemyTank_list):
+        for enemyTank in EnemyTank_list:
+            if enemyTank and enemyTank != self:
+                if pygame.sprite.collide_rect(enemyTank,self):
+                    self.stay()
+    
+    # 坦克位置还原的方法
+    def stay(self):
+        self.rect.left = self.oldLeft
+        self.rect.top = self.oldTop
+    
+    # 坦克碰撞墙壁的方法
+    def hitWalls(self,Wall_list):
+        for wall in Wall_list:
+            if pygame.sprite.collide_rect(wall,self):
+                self.stay()
+    
     # 坦克的射击方法
     def shoot(self):
         return Bullet(self)
@@ -64,8 +89,8 @@ class Tank(BaseItem):
         
 class MyTank(Tank):
     def __init__(self,left,top):
-        super().__init__(left,top)
-        
+        super(MyTank,self).__init__(left,top)
+       
 class EnemyTank(Tank):
     def __init__(self,left,top,speed=5) -> None:
         super(EnemyTank, self).__init__(left,top)
@@ -119,3 +144,9 @@ class EnemyTank(Tank):
         num = random.randint(1,25)
         if num == 1:
             return Bullet(self)
+    
+    # 新增主动碰撞我方坦克的方法
+    def hitMyTank(self,tank):
+        if tank and pygame.sprite.collide_rect(tank,self):
+                self.stay()
+    
